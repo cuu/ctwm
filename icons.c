@@ -463,16 +463,22 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 	icon->title_shrunk  = false;
 
 	GetColorFromList(Scr->IconBorderColorL, tmp_win->name, &tmp_win->class,
-	                 &icon->border);
+	                &icon->border);
 	GetColorFromList(Scr->IconForegroundL, tmp_win->name, &tmp_win->class,
-	                 &icon->iconc.fore);
+	                &icon->iconc.fore);
 	GetColorFromList(Scr->IconBackgroundL, tmp_win->name, &tmp_win->class,
-	                 &icon->iconc.back);
+	               &icon->iconc.back);
 	if(Scr->use3Diconmanagers && !Scr->BeNiceToColormap) {
 		GetShadeColors(&icon->iconc);
 	}
 
+
+
+	icon->iconc.back =67372036;
+	icon->iconc.fore = 3435973836;
+	icon->border   =  3014898611;
 	FB(icon->iconc.fore, icon->iconc.back);
+
 
 	icon->match   = match_none;
 	icon->image   = NULL;
@@ -518,7 +524,7 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 			                (IconDepth == 1)) {
 				GC gc;
 
-				image->mask = XCreatePixmap(dpy, Scr->Root, IconWidth, IconHeight, 1);
+				image->mask = XCreatePixmap(dpy, Scr->Root, IconWidth, IconHeight, Scr->d_depth);
 				if(image->mask) {
 					gc = XCreateGC(dpy, image->mask, 0, NULL);
 					if(gc) {
@@ -593,9 +599,7 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 		icon->w_height = icon->height + Scr->IconFont.height +
 		                 2 * (Scr->IconManagerShadowDepth + ICON_MGR_IBORDER);
 		icon->has_title = true;
-		if(icon->height) {
-			icon->border_width = 0;
-		}
+	
 	}
 
 	event_mask = 0;
@@ -622,11 +626,8 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 		icon->w = None;
 	}
 
-	if((image != NULL) &&
-	                image->mask != None &&
-	                !(tmp_win->wmhints->flags & IconWindowHint)) {
-		icon->border_width = 0;
-	}
+
+	//icon main window
 	if(icon->w == None) {
 		icon->w = XCreateSimpleWindow(dpy, Scr->Root,
 		                              0, 0,
@@ -748,6 +749,8 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 	XSaveContext(dpy, icon->w, ScreenContext, (XPointer)Scr);
 	XDefineCursor(dpy, icon->w, Scr->IconCursor);
 	MaybeAnimate = true;
+
+	
 }
 
 
