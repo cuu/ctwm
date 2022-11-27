@@ -1319,8 +1319,8 @@ RedoIconName(TwmWindow *win)
 			rect.y      = 0;
 			rect.width  = win->icon->width;
 			rect.height = win->icon->height;
-			XShapeCombineRectangles(dpy, win->icon->w, ShapeBounding,
-			                        0, 0, &rect, 1, ShapeSet, 0);
+			//XShapeCombineRectangles(dpy, win->icon->w, ShapeBounding,
+			//                      0, 0, &rect, 1, ShapeSet, 0);
 		}
 		if(win->icon->has_title) {
 			if(Scr->ShrinkIconTitles && win->icon->title_shrunk) {
