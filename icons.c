@@ -463,22 +463,16 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 	icon->title_shrunk  = false;
 
 	GetColorFromList(Scr->IconBorderColorL, tmp_win->name, &tmp_win->class,
-	                &icon->border);
+	                 &icon->border);
 	GetColorFromList(Scr->IconForegroundL, tmp_win->name, &tmp_win->class,
-	                &icon->iconc.fore);
+	                 &icon->iconc.fore);
 	GetColorFromList(Scr->IconBackgroundL, tmp_win->name, &tmp_win->class,
-	               &icon->iconc.back);
+	                 &icon->iconc.back);
 	if(Scr->use3Diconmanagers && !Scr->BeNiceToColormap) {
 		GetShadeColors(&icon->iconc);
 	}
 
-
-
-	icon->iconc.back =67372036;
-	icon->iconc.fore = 3435973836;
-	icon->border   =  3014898611;
 	FB(icon->iconc.fore, icon->iconc.back);
-
 
 	icon->match   = match_none;
 	icon->image   = NULL;
@@ -497,6 +491,23 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 		image = LookupIconNameOrClass(tmp_win, icon, &pattern);
 	}
 
+#ifdef EWMH
+	/*
+	 * Look to see if there is a _NET_WM_ICON property to provide an icon.
+	 */
+	
+	if(image == NULL) {
+		image = EwmhGetIcon(Scr, tmp_win);
+		if(image != NULL) {
+			icon->match   = match_net_wm_icon;
+			icon->width   = image->width;
+			icon->height  = image->height;
+			icon->image   = image;
+		}
+	}
+	
+#endif /* EWMH */
+
 	/* if the pixmap is still NULL, we didn't get one from the above code,
 	 * that could mean that ForceIcon was not set, or that the window
 	 * was not in the Icons list, now check the WM hints for an icon
@@ -511,8 +522,12 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 			image->height = IconHeight;
 			image->pixmap = XCreatePixmap(dpy, Scr->Root, image->width,
 			                              image->height, Scr->d_depth);
-			
-			XCopyPlane(dpy, tmp_win->wmhints->icon_pixmap, image->pixmap, Scr->NormalGC, 0, 0, image->width, image->height, 0, 0, 1);
+			//if(IconDepth == Scr->d_depth)
+			//	XCopyArea(dpy, tmp_win->wmhints->icon_pixmap, image->pixmap, Scr->NormalGC,
+			//	          0, 0, image->width, image->height, 0, 0);
+			//else
+			XCopyPlane(dpy, tmp_win->wmhints->icon_pixmap, image->pixmap, Scr->NormalGC,
+				           0, 0, image->width, image->height, 0, 0, 1);
 
 			icon->width   = image->width;
 			icon->height  = image->height;
@@ -599,7 +614,11 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 		icon->w_height = icon->height + Scr->IconFont.height +
 		                 2 * (Scr->IconManagerShadowDepth + ICON_MGR_IBORDER);
 		icon->has_title = true;
-	
+		/*
+		if(icon->height) {
+			icon->border_width = 0;
+		}
+		*/
 	}
 
 	event_mask = 0;
@@ -625,14 +644,20 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 	else {
 		icon->w = None;
 	}
-
-
-	//icon main window
+	/*
+	if((image != NULL) &&
+	                image->mask != None &&
+	                !(tmp_win->wmhints->flags & IconWindowHint)) {
+		icon->border_width = 0;
+	}
+	*/
 	if(icon->w == None) {
 		icon->w = XCreateSimpleWindow(dpy, Scr->Root,
 		                              0, 0,
 		                              icon->w_width, icon->w_height,
 		                              icon->border_width, icon->border, icon->iconc.back);
+					
+
 		event_mask = ExposureMask;
 	}
 
@@ -675,7 +700,8 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 			rect.y      = 0;
 			rect.width  = icon->width;
 			rect.height = icon->height;
-			//XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeSet, 0);
+			//XShapeCombineRectangles(dpy, icon->w, ShapeBounding,
+			//                        0, 0, &rect, 1, ShapeSet, 0);
 		}
 		if(icon->has_title) {
 			if(Scr->ShrinkIconTitles) {
@@ -692,8 +718,8 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 				rect.height = icon->w_height - icon->height;
 				icon->title_shrunk = false;
 			}
-			XShapeCombineRectangles(dpy, icon->w, ShapeBounding,
-			                        0, 0, &rect, 1, ShapeUnion, 0);
+			//XShapeCombineRectangles(dpy, icon->w, ShapeBounding,
+			//                        0, 0, &rect, 1, ShapeUnion, 0);
 		}
 	}
 
@@ -749,8 +775,6 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 	XSaveContext(dpy, icon->w, ScreenContext, (XPointer)Scr);
 	XDefineCursor(dpy, icon->w, Scr->IconCursor);
 	MaybeAnimate = true;
-
-	
 }
 
 
@@ -1081,15 +1105,16 @@ ReshapeIcon(Icon *icon)
 	XMoveWindow(dpy, icon->bm_w, x, 0);
 
 	if(icon->image && icon->image->mask) {
-		XShapeCombineMask(dpy, icon->w, ShapeBounding, x, 0, icon->image->mask,
-		                  ShapeSet);
+	  //XShapeCombineMask(dpy, icon->w, ShapeBounding, x, 0, icon->image->mask,
+	  //	                  ShapeSet);
 	}
 	else {
 		rect.x      = x;
 		rect.y      = 0;
 		rect.width  = icon->width;
 		rect.height = icon->height;
-		//XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeSet,0);
+		//XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeSet,
+		//                      0);
 	}
 	rect.x      = x;
 	rect.y      = icon->height;
@@ -1286,15 +1311,16 @@ RedoIconName(TwmWindow *win)
 		if(win->icon->image && win->icon->image->mask) {
 			XShapeCombineMask(dpy, win->icon->bm_w, ShapeBounding, 0, 0,
 			                  win->icon->image->mask, ShapeSet);
-			XShapeCombineMask(dpy, win->icon->w, ShapeBounding, x, 0,
-			                  win->icon->image->mask, ShapeSet);
+			//XShapeCombineMask(dpy, win->icon->w, ShapeBounding, x, 0,
+			//                  win->icon->image->mask, ShapeSet);
 		}
 		else if(win->icon->has_title) {
 			rect.x      = x;
 			rect.y      = 0;
 			rect.width  = win->icon->width;
 			rect.height = win->icon->height;
-			//XShapeCombineRectangles(dpy, win->icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeSet, 0);
+			XShapeCombineRectangles(dpy, win->icon->w, ShapeBounding,
+			                        0, 0, &rect, 1, ShapeSet, 0);
 		}
 		if(win->icon->has_title) {
 			if(Scr->ShrinkIconTitles && win->icon->title_shrunk) {
