@@ -539,7 +539,7 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 			                (IconDepth == 1)) {
 				GC gc;
 
-				image->mask = XCreatePixmap(dpy, Scr->Root, IconWidth, IconHeight, Scr->d_depth);
+				image->mask = XCreatePixmap(dpy, Scr->Root, IconWidth, IconHeight, 1);
 				if(image->mask) {
 					gc = XCreateGC(dpy, image->mask, 0, NULL);
 					if(gc) {
@@ -1113,8 +1113,7 @@ ReshapeIcon(Icon *icon)
 		rect.y      = 0;
 		rect.width  = icon->width;
 		rect.height = icon->height;
-		//XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeSet,
-		//                      0);
+		XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeSet,                   0);
 	}
 	rect.x      = x;
 	rect.y      = icon->height;
@@ -1335,8 +1334,8 @@ RedoIconName(TwmWindow *win)
 				rect.width  = win->icon->w_width;
 				rect.height = win->icon->w_height - win->icon->height;
 			}
-			XShapeCombineRectangles(dpy,  win->icon->w, ShapeBounding, 0,
-			                        0, &rect, 1, ShapeUnion, 0);
+			//XShapeCombineRectangles(dpy,  win->icon->w, ShapeBounding, 0,
+			  //                      0, &rect, 1, ShapeUnion, 0);
 		}
 	}
 	if(Scr->ShrinkIconTitles &&
