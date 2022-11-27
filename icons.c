@@ -644,13 +644,13 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 	else {
 		icon->w = None;
 	}
-	/*
+	
 	if((image != NULL) &&
 	                image->mask != None &&
 	                !(tmp_win->wmhints->flags & IconWindowHint)) {
 		icon->border_width = 0;
 	}
-	*/
+	
 	if(icon->w == None) {
 		icon->w = XCreateSimpleWindow(dpy, Scr->Root,
 		                              0, 0,
