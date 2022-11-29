@@ -645,12 +645,13 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 		icon->w = None;
 	}
 	
+	/*
 	if((image != NULL) &&
 	                image->mask != None &&
 	                !(tmp_win->wmhints->flags & IconWindowHint)) {
 		icon->border_width = 0;
 	}
-	
+	*/
 	if(icon->w == None) {
 		icon->w = XCreateSimpleWindow(dpy, Scr->Root,
 		                              0, 0,
@@ -1046,8 +1047,7 @@ ShrinkIconTitle(TwmWindow *tmp_win)
 	rect.y      = 0;
 	rect.width  = icon->width;
 	rect.height = icon->w_height;
-	XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1,
-	                        ShapeIntersect, 0);
+	//XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1,ShapeIntersect, 0);
 	icon->title_shrunk = true;
 	XClearArea(dpy, icon->w, 0, icon->height, icon->w_width,
 	           icon->w_height - icon->height, True);
@@ -1078,8 +1078,7 @@ ExpandIconTitle(TwmWindow *tmp_win)
 	rect.y      = icon->height;
 	rect.width  = icon->w_width;
 	rect.height = icon->w_height - icon->height;
-	XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeUnion,
-	                        0);
+	//XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeUnion, 0);
 	icon->title_shrunk = false;
 	XClearArea(dpy, icon->w, 0, icon->height, icon->w_width,
 	           icon->w_height - icon->height, True);
@@ -1113,14 +1112,13 @@ ReshapeIcon(Icon *icon)
 		rect.y      = 0;
 		rect.width  = icon->width;
 		rect.height = icon->height;
-		XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeSet,                   0);
+		//XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeSet,                   0);
 	}
 	rect.x      = x;
 	rect.y      = icon->height;
 	rect.width  = icon->width;
 	rect.height = icon->w_height - icon->height;
-	XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeUnion,
-	                        0);
+	//XShapeCombineRectangles(dpy, icon->w, ShapeBounding, 0, 0, &rect, 1, ShapeUnion,0);
 }
 
 

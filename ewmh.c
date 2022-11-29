@@ -1006,8 +1006,7 @@ static void EwmhHandle_NET_WM_ICONNotify(XPropertyEvent *event,
 		rect.y      = 0;
 		rect.width  = twm_win->icon->width;
 		rect.height = twm_win->icon->height;
-		XShapeCombineRectangles(dpy, twm_win->icon->w, ShapeBounding, 0,
-		                        0, &rect, 1, ShapeUnion, 0);
+		//XShapeCombineRectangles(dpy, twm_win->icon->w, ShapeBounding, 0,0, &rect, 1, ShapeUnion, 0);
 	}
 	XMapSubwindows(dpy, twm_win->icon->w);
 	RedoIconName(twm_win);
