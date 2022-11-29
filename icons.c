@@ -693,7 +693,7 @@ CreateIconWindow(TwmWindow *tmp_win, int def_x, int def_y)
 		                           Scr->d_visual, valuemask,
 		                           &attributes);
 		if(image->mask) {
-		  //XShapeCombineMask(dpy, icon->bm_w, ShapeBounding, 0, 0, image->mask, ShapeSet);
+		  	XShapeCombineMask(dpy, icon->bm_w, ShapeBounding, 0, 0, image->mask, ShapeSet);
 			//XShapeCombineMask(dpy, icon->w,    ShapeBounding, x, 0, image->mask, ShapeSet);
 		}
 		else if(icon->has_title) {
@@ -1306,8 +1306,8 @@ RedoIconName(TwmWindow *win)
 		XMoveWindow(dpy, win->icon->bm_w, x, 0);
 		XMapWindow(dpy, win->icon->bm_w);
 		if(win->icon->image && win->icon->image->mask) {
-		  ///XShapeCombineMask(dpy, win->icon->bm_w, ShapeBounding, 0, 0,
-		  //	                  win->icon->image->mask, ShapeSet);
+		  XShapeCombineMask(dpy, win->icon->bm_w, ShapeBounding, 0, 0,
+		  	                  win->icon->image->mask, ShapeSet);
 			//XShapeCombineMask(dpy, win->icon->w, ShapeBounding, x, 0,
 			//                  win->icon->image->mask, ShapeSet);
 		}

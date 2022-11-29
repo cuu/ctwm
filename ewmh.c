@@ -994,8 +994,7 @@ static void EwmhHandle_NET_WM_ICONNotify(XPropertyEvent *event,
 	                      valuemask, &attributes);
 
 	if(image->mask) {
-	  //XShapeCombineMask(dpy, twm_win->icon->bm_w, ShapeBounding, 0, 0, image->mask,
-		                  //ShapeSet);
+	  	XShapeCombineMask(dpy, twm_win->icon->bm_w, ShapeBounding, 0, 0, image->mask, ShapeSet);
 		//XShapeCombineMask(dpy, twm_win->icon->w,    ShapeBounding, x, 0, image->mask,
 		//                  ShapeSet);
 	}
